@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "DropCard",
+    "slug": "DropCard",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sirakinb.dropcard.testflight",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "DropCard needs access to your photo library to upload profile pictures for your business cards.",
+        "NSCameraUsageDescription": "DropCard needs access to your camera to take profile pictures for your business cards.",
+        "NSContactsUsageDescription": "DropCard needs access to your contacts to help you manage your business connections."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.sirakinb.dropcard.testflight"
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "27ecee09-0e2d-423a-8048-4d17aa50dd06"
+      }
+    },
+    "owner": "defipapi"
+  }
+}
