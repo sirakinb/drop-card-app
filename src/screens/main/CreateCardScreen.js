@@ -236,7 +236,11 @@ export default function CreateCardScreen({ navigation, route }) {
       Alert.alert('Please Fix Errors', 'Please correct the highlighted fields before previewing.');
       return;
     }
-    navigation.navigate('CardDisplay', { cardData: formData, avatar });
+    navigation.navigate('CardDisplay', { 
+      cardData: formData, 
+      avatar,
+      source: 'CreateCard'
+    });
   };
 
   const handleSave = async () => {

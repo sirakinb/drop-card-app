@@ -13,7 +13,7 @@ import BusinessCard from '../../components/cards/BusinessCard';
 import QRCodeDisplay from '../../components/cards/QRCodeDisplay';
 
 export default function CardDisplayScreen({ navigation, route }) {
-  const { cardData = {}, avatar: initialAvatar, editMode = false } = route.params || {};
+  const { cardData = {}, avatar: initialAvatar, editMode = false, source } = route.params || {};
   const [avatar, setAvatar] = useState(initialAvatar || null);
 
   // Handle missing card data case
@@ -50,7 +50,11 @@ export default function CardDisplayScreen({ navigation, route }) {
   };
 
   const handleBackToCards = () => {
-    navigation.navigate('MainTabs', { screen: 'Cards' });
+    if (source === 'CreateCard') {
+      navigation.goBack(); // Go back to Create Card screen
+    } else {
+      navigation.navigate('MainTabs', { screen: 'Cards' });
+    }
   };
 
   return (
@@ -140,7 +144,9 @@ export default function CardDisplayScreen({ navigation, route }) {
       {/* Bottom Action Button */}
       <View style={styles.bottomAction}>
         <TouchableOpacity style={styles.primaryButton} onPress={handleBackToCards}>
-          <Text style={styles.primaryButtonText}>Back to Cards</Text>
+          <Text style={styles.primaryButtonText}>
+            {source === 'CreateCard' ? 'Back to Create Card' : 'Back to Cards'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
