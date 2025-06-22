@@ -239,43 +239,25 @@ export default function SettingsScreen({ navigation }) {
           />
         </SettingSection>
 
-        {/* Data & Privacy */}
-        <SettingSection title="Data & Privacy">
-          <SettingItem
-            icon="download-outline"
-            title="Export Data"
-            subtitle="Download your information"
-            onPress={() => Alert.alert('Feature Coming Soon', 'Data export will be available in a future update.')}
-          />
-          <SettingItem
-            icon="shield-checkmark-outline"
-            title="Privacy Policy"
-            onPress={() => Alert.alert('Privacy Policy', 'Our privacy policy protects your data and explains how we use it.')}
-          />
-        </SettingSection>
-
         {/* Support */}
         <SettingSection title="Support">
           <SettingItem
-            icon="help-circle-outline"
-            title="Help & FAQ"
-            onPress={() => Alert.alert('Help', 'Visit our support website or contact us at support@dropcard.app')}
-          />
-          <SettingItem
             icon="mail-outline"
             title="Contact Support"
-            onPress={() => Alert.alert('Contact Support', 'Email us at support@dropcard.app for assistance.')}
-          />
-          <SettingItem
-            icon="star-outline"
-            title="Rate the App"
-            onPress={() => Alert.alert('Rate DropCard', 'Thanks for using DropCard! Please rate us on the App Store.')}
+            subtitle="Get help and send feedback"
+            onPress={() => {
+              Alert.alert(
+                'Contact Us',
+                'For any questions, please email us at dropcardai@gmail.com.',
+                [{ text: 'OK' }]
+              );
+            }}
           />
           <SettingItem
             icon="information-circle-outline"
             title="About"
-            subtitle="Version 1.0.0"
-            onPress={() => Alert.alert('About DropCard', 'DropCard v1.0.0\nYour digital business card solution.')}
+            subtitle="App version, licenses"
+            onPress={() => Alert.alert('About', 'Version 1.0')}
           />
         </SettingSection>
 

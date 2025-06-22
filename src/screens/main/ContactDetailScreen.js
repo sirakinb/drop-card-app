@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Modal,
   StatusBar,
   Linking,
 } from 'react-native';
@@ -14,7 +13,6 @@ import { getInitials, getAvatarColor, formatLastContact } from '../../utils/cont
 
 export default function ContactDetailScreen({ route, navigation }) {
   const { contact } = route.params;
-  const [showAIModal, setShowAIModal] = useState(false);
 
   const handlePhonePress = () => {
     if (contact.phone) {
@@ -172,52 +170,7 @@ export default function ContactDetailScreen({ route, navigation }) {
             </View>
           </View>
         )}
-
-        {/* Enhance with AI Button */}
-        <View style={styles.aiSection}>
-          <TouchableOpacity
-            style={styles.aiButton}
-            onPress={() => setShowAIModal(true)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.aiButtonContent}>
-              <View style={styles.aiIcon}>
-                <Ionicons name="sparkles" size={24} color="#ffffff" />
-              </View>
-              <View style={styles.aiTextContainer}>
-                <Text style={styles.aiButtonTitle}>Enhance with AI</Text>
-                <Text style={styles.aiButtonSubtitle}>Generate smart contact insights</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
-
-      {/* AI Coming Soon Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={showAIModal}
-        onRequestClose={() => setShowAIModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalIcon}>
-              <Ionicons name="sparkles" size={48} color="#7C3AED" />
-            </View>
-            <Text style={styles.modalTitle}>Coming Soon</Text>
-            <Text style={styles.modalMessage}>
-              AI-powered contact enhancement is on its way! This feature will provide intelligent insights about your contacts, and help you build stronger relationships.
-            </Text>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => setShowAIModal(false)}
-            >
-              <Text style={styles.modalButtonText}>Got it</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -393,109 +346,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#374151',
-  },
-  aiSection: {
-    marginTop: 32,
-    marginHorizontal: 16,
-    marginBottom: 32,
-  },
-  aiButton: {
-    backgroundColor: '#7C3AED',
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#7C3AED',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  aiButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-  },
-  aiIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  aiTextContainer: {
-    flex: 1,
-  },
-  aiButtonTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 2,
-  },
-  aiButtonSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  modalContent: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 32,
-    alignItems: 'center',
-    maxWidth: 320,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 20,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 25,
-    elevation: 25,
-  },
-  modalIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  modalMessage: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  modalButton: {
-    backgroundColor: '#7C3AED',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 8,
-    minWidth: 120,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
-    textAlign: 'center',
   },
 }); 

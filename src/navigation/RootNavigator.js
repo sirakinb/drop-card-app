@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -10,7 +10,7 @@ import SignUpScreen from '../screens/auth/SignUpScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 
 // Main app screens
-import OnboardingScreen from '../screens/OnboardingScreen';
+import NewOnboardingScreen from '../screens/onboarding/NewOnboardingScreen';
 import CreateCardScreen from '../screens/main/CreateCardScreen';
 import CardDisplayScreen from '../screens/main/CardDisplayScreen';
 import AddContactScreen from '../screens/main/AddContactScreen';
@@ -35,9 +35,48 @@ export default function RootNavigator() {
     }
 
     try {
-      // Check if user has completed onboarding
-      const hasCompletedOnboarding = await AsyncStorage.getItem(`onboarding_completed_${user.id}`);
-      setIsFirstTime(!hasCompletedOnboarding);
+      console.log('🔍 Checking onboarding status for user:', user.id);
+      
+      // Get all AsyncStorage keys to check for any existing onboarding data
+      const allKeys = await AsyncStorage.getAllKeys();
+      console.log('🔍 All AsyncStorage keys:', allKeys);
+      
+      const onboardingCompleted = await AsyncStorage.getItem(
+        `onboarding_completed_${user.id}`
+      );
+      console.log('🔍 Onboarding completion data:', onboardingCompleted);
+      
+      // If we have completion data, let's parse and log it
+      if (onboardingCompleted) {
+        try {
+          const parsed = JSON.parse(onboardingCompleted);
+          console.log('🔍 Parsed completion data:', parsed);
+          console.log('🔍 Debug ID:', parsed.debugId);
+          console.log('🔍 Session ID:', parsed.sessionId);
+        } catch (parseError) {
+          console.log('🔍 Completion data is not JSON:', onboardingCompleted);
+        }
+      }
+      
+      // Check if this is a truly new user by checking if they have any backend data
+      // If they don't have completion data, we consider them a first-time user
+      const firstTime = onboardingCompleted === null;
+      console.log('🔍 Is first time user:', firstTime);
+      
+      // If this is a first-time user, clear any orphaned onboarding data from other users
+      // This handles the case where a user was deleted but their AsyncStorage data remains
+      if (firstTime) {
+        const onboardingKeys = allKeys.filter(key => 
+          key.startsWith('onboarding_completed_') && key !== `onboarding_completed_${user.id}`
+        );
+        
+        if (onboardingKeys.length > 0) {
+          console.log('🧹 Clearing orphaned onboarding data for deleted users:', onboardingKeys);
+          await AsyncStorage.multiRemove(onboardingKeys);
+        }
+      }
+      
+      setIsFirstTime(firstTime);
     } catch (error) {
       console.error('Error checking first time user:', error);
       setIsFirstTime(false); // Default to not first time if error
@@ -45,6 +84,30 @@ export default function RootNavigator() {
       setCheckingFirstTime(false);
     }
   };
+
+  const handleOnboardingComplete = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      console.log('✅ Onboarding complete for user:', user.id);
+      const completionData = {
+        completedAt: new Date().toISOString(),
+        debugId: 'onboarding-flow-v1',
+        sessionId: Math.random().toString(36).substring(2, 15),
+      };
+      
+      await AsyncStorage.setItem(
+        `onboarding_completed_${user.id}`,
+        JSON.stringify(completionData)
+      );
+      
+      console.log('✅ Onboarding status saved to AsyncStorage');
+      setIsFirstTime(false);
+    } catch (error) {
+      console.error('Error saving onboarding completion:', error);
+      // Optionally, show an alert to the user
+    }
+  }, [user]);
 
   if (loading || checkingFirstTime) {
     return (
@@ -56,26 +119,32 @@ export default function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {user ? (
-        // User is signed in
+      {!user ? (
+        // Auth Stack
         <>
-          {isFirstTime ? (
-            // First time user - show onboarding flow first
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          ) : null}
-          {/* Main app screens available to all authenticated users */}
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        </>
+      ) : (
+        // Main App Stack
+        <>
+          {isFirstTime && (
+            <Stack.Screen 
+              name="Onboarding" 
+              options={{ 
+                gestureEnabled: false,
+                animationEnabled: true 
+              }}
+            >
+              {(props) => <NewOnboardingScreen {...props} onComplete={handleOnboardingComplete} />}
+            </Stack.Screen>
+          )}
           <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="CreateCard" component={CreateCardScreen} />
           <Stack.Screen name="CardDisplay" component={CardDisplayScreen} />
           <Stack.Screen name="AddContact" component={AddContactScreen} />
           <Stack.Screen name="ContactDetail" component={ContactDetailScreen} />
-        </>
-      ) : (
-        // User is not signed in - show auth flow
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         </>
       )}
     </Stack.Navigator>
