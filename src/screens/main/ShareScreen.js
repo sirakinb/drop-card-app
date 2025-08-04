@@ -15,6 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { businessCardService } from '../../services/database';
 import QRCodeDisplay from '../../components/cards/QRCodeDisplay';
 import BusinessCard from '../../components/cards/BusinessCard';
+import { getWebProfileUrl } from '../../utils/contactUtils';
 
 export default function ShareScreen({ navigation, route }) {
   const { user } = useAuth();
@@ -179,6 +180,7 @@ Shared via DropCard
             cardData={currentCard}
             size={180}
             showActions={false}
+            profileUrl={getWebProfileUrl(currentCard?.id)}
           />
         </View>
 

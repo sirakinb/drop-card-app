@@ -41,12 +41,13 @@ export default function CardDisplayScreen({ navigation, route }) {
   };
 
   const handlePreview = () => {
-    // Toggle between preview and edit modes
-    Alert.alert(
-      'Card Preview',
-      'This is how your card appears to others when shared.',
-      [{ text: 'OK' }]
-    );
+    // Open the web profile URL in the browser
+    const url = getWebProfileUrl(cardData.id);
+    if (url) {
+      Linking.openURL(url);
+    } else {
+      Alert.alert('Error', 'No web profile URL available.');
+    }
   };
 
   const handleBackToCards = () => {
@@ -107,6 +108,7 @@ export default function CardDisplayScreen({ navigation, route }) {
             size={200}
             showActions={true}
             style={styles.qrDisplay}
+            profileUrl={getWebProfileUrl(cardData.id)}
           />
         </View>
 

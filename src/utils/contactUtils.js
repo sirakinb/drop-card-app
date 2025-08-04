@@ -70,4 +70,17 @@ export const formatLastContact = (date) => {
   if (diffDays < 7) return `${diffDays} days ago`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
   return `${Math.floor(diffDays / 30)} months ago`;
+};
+
+import { getWebProfileUrl as getConfigWebProfileUrl } from '../config/environment';
+
+/**
+ * Generate the web profile URL for a given card id
+ * @param {string} cardId - The business card's unique id
+ * @returns {string} - The web profile URL
+ */
+export const getWebProfileUrl = (cardId) => {
+  if (!cardId || typeof cardId !== 'string') return '';
+  const baseUrl = getConfigWebProfileUrl();
+  return `${baseUrl}/${cardId}`;
 }; 
