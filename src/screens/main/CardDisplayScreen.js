@@ -7,10 +7,12 @@ import {
   StatusBar,
   Alert,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BusinessCard from '../../components/cards/BusinessCard';
 import QRCodeDisplay from '../../components/cards/QRCodeDisplay';
+import { getWebProfileUrl } from '../../utils/contactUtils';
 
 export default function CardDisplayScreen({ navigation, route }) {
   const { cardData = {}, avatar: initialAvatar, editMode = false, source } = route.params || {};
