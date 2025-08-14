@@ -117,9 +117,18 @@ export default function CardsScreen({ navigation }) {
     }
 
     try {
+      // Set loading state for initial load or force refresh
+      if (forceRefresh || loading) {
+        setLoading(true);
+      }
+
       // 1. Show cached data immediately (unless force refresh)
       if (!forceRefresh) {
         await loadCardsFromCache();
+        // Turn off loading after cache is loaded for initial load
+        if (loading) {
+          setLoading(false);
+        }
       }
 
       // 2. Fetch fresh data in background
@@ -128,9 +137,10 @@ export default function CardsScreen({ navigation }) {
     } catch (error) {
       console.error('Error in loadCards:', error);
     } finally {
-      if (forceRefresh) setLoading(false);
+      // Always turn off loading state
+      setLoading(false);
     }
-  }, [authLoading, user, loadCardsFromCache, fetchFreshCards]);
+  }, [authLoading, user, loading, loadCardsFromCache, fetchFreshCards]);
 
   const onRefresh = async () => {
     setRefreshing(true);

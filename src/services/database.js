@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import * as FileSystem from 'expo-file-system';
 
 // Profile Service
 export const profileService = {
@@ -179,6 +180,24 @@ export const businessCardService = {
     } catch (error) {
       console.error('Error setting primary card:', error);
       return { data: null, error: error.message };
+    }
+  }
+};
+
+// Storage Service for Contact Photos - Using Database Storage
+export const storageService = {
+  async convertImageToBase64(imageUri) {
+    try {
+      // Read the image as base64
+      const base64 = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      
+      // Return as data URI that can be directly used in Image component
+      return `data:image/jpeg;base64,${base64}`;
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      throw error;
     }
   }
 };

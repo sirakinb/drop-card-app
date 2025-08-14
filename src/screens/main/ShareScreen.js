@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,10 @@ import {
   Share,
   StatusBar,
   Linking,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { businessCardService } from '../../services/database';
 import QRCodeDisplay from '../../components/cards/QRCodeDisplay';
@@ -22,18 +24,11 @@ export default function ShareScreen({ navigation, route }) {
   const { cardData, avatar } = route.params || {};
   const [primaryCard, setPrimaryCard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const currentCard = cardData || primaryCard;
 
-  useEffect(() => {
-    if (!cardData) {
-      loadPrimaryCard();
-    } else {
-      setLoading(false);
-    }
-  }, [cardData]);
-
-  const loadPrimaryCard = async () => {
+  const loadPrimaryCard = useCallback(async () => {
     try {
       const result = await businessCardService.getUserCards();
       if (result.error) {
@@ -62,7 +57,30 @@ export default function ShareScreen({ navigation, route }) {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadPrimaryCard();
+    setRefreshing(false);
   };
+
+  useEffect(() => {
+    if (!cardData) {
+      loadPrimaryCard();
+    } else {
+      setLoading(false);
+    }
+  }, [cardData, loadPrimaryCard]);
+
+  // Load card when screen comes into focus to reflect updates
+  useFocusEffect(
+    useCallback(() => {
+      if (!cardData) {
+        loadPrimaryCard();
+      }
+    }, [cardData, loadPrimaryCard])
+  );
 
   const handleNativeShare = async () => {
     if (!currentCard) return;
@@ -156,7 +174,13 @@ Shared via DropCard
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Share Your Card</Text>
