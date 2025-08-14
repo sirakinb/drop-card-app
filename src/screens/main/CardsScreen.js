@@ -8,7 +8,9 @@ import {
   FlatList,
   RefreshControl,
   Alert,
+  AppState,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
@@ -20,31 +22,119 @@ export default function CardsScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadCards = useCallback(async () => {
+  // Cache key for storing cards
+  const getCacheKey = useCallback(() => {
+    return user ? `cards_cache_${user.id}` : null;
+  }, [user]);
+
+  // Load cards from cache first, then fetch fresh data
+  const loadCardsFromCache = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const cacheKey = getCacheKey();
+      if (cacheKey) {
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        if (cachedData) {
+          const parsedCards = JSON.parse(cachedData);
+          console.log('Loaded cards from cache:', parsedCards.length);
+          setCards(parsedCards);
+        }
+      }
+    } catch (error) {
+      console.log('Cache load error (non-critical):', error);
+    }
+  }, [user, getCacheKey]);
+
+  // Save cards to cache
+  const saveCardsToCache = useCallback(async (cardsData) => {
+    if (!user || !cardsData) return;
+
+    try {
+      const cacheKey = getCacheKey();
+      if (cacheKey) {
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(cardsData));
+        console.log('Saved cards to cache:', cardsData.length);
+      }
+    } catch (error) {
+      console.log('Cache save error (non-critical):', error);
+    }
+  }, [user, getCacheKey]);
+
+  // Fetch fresh cards from server
+  const fetchFreshCards = useCallback(async (showLoading = false) => {
     // Don't try to load cards if auth is still loading or user is not authenticated
+    if (authLoading || !user) {
+      return;
+    }
+
+    try {
+      if (showLoading) setLoading(true);
+      
+      const result = await businessCardService.getUserCards();
+      if (result.error) {
+        // Check if it's an auth error
+        if (result.error.includes('auth') || result.error.includes('unauthorized') || result.error.includes('JWT')) {
+          console.log('Authentication error during fresh fetch');
+          return;
+        }
+        throw new Error(result.error);
+      }
+
+      const freshCards = result.data || [];
+      console.log('Fetched fresh cards:', freshCards.length);
+      
+      // Update UI and cache
+      setCards(freshCards);
+      await saveCardsToCache(freshCards);
+      
+      return freshCards;
+    } catch (error) {
+      console.error('Error fetching fresh cards:', error);
+      
+      // Don't show alert for auth errors
+      const errorMessage = error.message?.toLowerCase() || '';
+      if (!errorMessage.includes('auth') && !errorMessage.includes('unauthorized') && !errorMessage.includes('jwt')) {
+        // Only show error if we don't have cached data
+        if (cards.length === 0) {
+          Alert.alert(
+            'Connection Issue', 
+            'Unable to load latest cards. Using cached data.',
+            [{ text: 'OK' }]
+          );
+        }
+      }
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  }, [authLoading, user, cards.length, saveCardsToCache]);
+
+  // Main load function: cache-first, then background refresh
+  const loadCards = useCallback(async (forceRefresh = false) => {
     if (authLoading || !user) {
       setLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
-      const result = await businessCardService.getUserCards();
-      if (result.error) {
-        throw new Error(result.error);
+      // 1. Show cached data immediately (unless force refresh)
+      if (!forceRefresh) {
+        await loadCardsFromCache();
       }
-      setCards(result.data || []);
+
+      // 2. Fetch fresh data in background
+      await fetchFreshCards(forceRefresh);
+      
     } catch (error) {
-      console.error('Error loading cards:', error);
-      Alert.alert('Error', 'Failed to load cards. Please try again.');
+      console.error('Error in loadCards:', error);
     } finally {
-      setLoading(false);
+      if (forceRefresh) setLoading(false);
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, loadCardsFromCache, fetchFreshCards]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadCards();
+    await loadCards(true); // Force refresh when user pulls down
     setRefreshing(false);
   };
 
@@ -61,6 +151,19 @@ export default function CardsScreen({ navigation }) {
       loadCards();
     }
   }, [authLoading, user, loadCards]);
+
+  // Auto-refresh when app comes to foreground (catches web updates)
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState) => {
+      if (nextAppState === 'active' && user && !authLoading) {
+        console.log('App became active, refreshing cards in background');
+        fetchFreshCards(false); // Background refresh, no loading spinner
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription?.remove();
+  }, [user, authLoading, fetchFreshCards]);
 
   const handleCardPress = (card) => {
     navigation.navigate('CardDisplay', { 
