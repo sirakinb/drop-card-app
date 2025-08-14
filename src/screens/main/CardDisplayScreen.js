@@ -42,13 +42,37 @@ export default function CardDisplayScreen({ navigation, route }) {
     });
   };
 
-  const handlePreview = () => {
-    // Open the web profile URL in the browser
-    const url = getWebProfileUrl(cardData.id);
-    if (url) {
-      Linking.openURL(url);
-    } else {
-      Alert.alert('Error', 'No web profile URL available.');
+  const handlePreview = async () => {
+    try {
+      const url = getWebProfileUrl(cardData.id);
+      if (!url) {
+        Alert.alert('Error', 'No web profile URL available.');
+        return;
+      }
+
+      // Check if URL can be opened
+      const canOpen = await Linking.canOpenURL(url);
+      if (!canOpen) {
+        Alert.alert(
+          'Profile Syncing', 
+          'Your profile update is still syncing with the web app. Please check back in a few minutes.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      // Try to open the URL
+      await Linking.openURL(url);
+    } catch (error) {
+      console.log('Preview error:', error);
+      Alert.alert(
+        'Profile Syncing', 
+        'Your profile update is still syncing with the web app. Please check back in a few minutes.',
+        [
+          { text: 'Try Again', onPress: () => handlePreview() },
+          { text: 'OK', style: 'cancel' }
+        ]
+      );
     }
   };
 
