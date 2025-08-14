@@ -126,6 +126,11 @@ export default function CardDisplayScreen({ navigation, route }) {
                 { label: 'Email', value: cardData.email },
                 { label: 'Phone', value: cardData.phone },
                 { label: 'Website', value: cardData.website },
+                { label: 'LinkedIn', value: cardData.linkedin },
+                { label: 'Twitter', value: cardData.twitter },
+                { label: 'Instagram', value: cardData.instagram },
+                { label: 'TikTok', value: cardData.tiktok },
+                { label: 'YouTube', value: cardData.youtube },
               ].filter(item => item.required || item.value);
 
               return infoItems.map((item, index) => (

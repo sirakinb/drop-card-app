@@ -27,6 +27,11 @@ export default function CreateCardScreen({ navigation, route }) {
     email: cardData?.email || '',
     phone: cardData?.phone || '',
     website: cardData?.website || '',
+    linkedin: cardData?.linkedin || '',
+    twitter: cardData?.twitter || '',
+    instagram: cardData?.instagram || '',
+    tiktok: cardData?.tiktok || '',
+    youtube: cardData?.youtube || '',
     theme_color: cardData?.theme_color || '#000000',
   });
   const [errors, setErrors] = useState({});
@@ -423,6 +428,71 @@ export default function CreateCardScreen({ navigation, route }) {
               autoCapitalize="none"
             />
             {errors.website && <Text style={styles.errorText}>{errors.website}</Text>}
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>LinkedIn</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="linkedin.com/in/yourprofile"
+              placeholderTextColor="#9CA3AF"
+              value={formData.linkedin}
+              onChangeText={(value) => updateFormData('linkedin', value)}
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Twitter</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="@yourusername"
+              placeholderTextColor="#9CA3AF"
+              value={formData.twitter}
+              onChangeText={(value) => updateFormData('twitter', value)}
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Instagram</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="@yourusername"
+              placeholderTextColor="#9CA3AF"
+              value={formData.instagram}
+              onChangeText={(value) => updateFormData('instagram', value)}
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>TikTok</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="@yourusername"
+              placeholderTextColor="#9CA3AF"
+              value={formData.tiktok}
+              onChangeText={(value) => updateFormData('tiktok', value)}
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>YouTube</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="youtube.com/@yourchannel"
+              placeholderTextColor="#9CA3AF"
+              value={formData.youtube}
+              onChangeText={(value) => updateFormData('youtube', value)}
+              keyboardType="url"
+              autoCapitalize="none"
+            />
           </View>
 
           {/* Theme Color Selection */}

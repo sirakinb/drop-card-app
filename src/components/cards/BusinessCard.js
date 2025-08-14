@@ -21,6 +21,11 @@ export default function BusinessCard({
     email = '',
     phone = '',
     website = '',
+    linkedin = '',
+    twitter = '',
+    instagram = '',
+    tiktok = '',
+    youtube = '',
     avatar_url = ''
   } = cardData || {};
 
@@ -101,6 +106,12 @@ export default function BusinessCard({
               <View style={styles.contactItem}>
                 <Text style={styles.contactLabel}>Website</Text>
                 <Text style={styles.contactValue} numberOfLines={1}>{website}</Text>
+              </View>
+            )}
+            {linkedin && (
+              <View style={styles.contactItem}>
+                <Text style={styles.contactLabel}>LinkedIn</Text>
+                <Text style={styles.contactValue} numberOfLines={1}>{linkedin}</Text>
               </View>
             )}
           </View>
