@@ -220,8 +220,8 @@ export default function SettingsScreen({ navigation }) {
           />
         </SettingSection>
 
-        {/* App Preferences */}
-        <SettingSection title="Preferences">
+        {/* Contact Intelligence */}
+        <SettingSection title="Contact Intelligence">
           <SettingItem
             icon="notifications-outline"
             title="Notifications"
@@ -236,6 +236,18 @@ export default function SettingsScreen({ navigation }) {
               />
             }
             showChevron={false}
+          />
+          <SettingItem
+            icon="chatbubble-ellipses-outline"
+            title="AI Chat"
+            subtitle="Coming soon"
+            onPress={() => {
+              Alert.alert(
+                'Coming Soon',
+                'Brainstorm on your networking and event experiences, and discuss actionable insights with an AI copilot',
+                [{ text: 'OK' }]
+              );
+            }}
           />
         </SettingSection>
 

@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+Never run `git pull`, `git push`, or `git fetch` commands automatically.
+Never stage or commit files without explicit user confirmation.
+When suggesting Git commands, always explain what they do and why before running them.
+Never switch branches without user approval.
+Always ask before making changes to pre-existing features that are not being requested for changes in the prompt 
